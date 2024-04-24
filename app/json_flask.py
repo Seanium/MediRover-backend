@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-
 from json_response import JsonResponse
 
 

@@ -1,21 +1,32 @@
-from flask_cors import CORS
-from flask import request
-import json
 import sys
 import os
 
-from json_flask import JsonFlask
-from json_response import JsonResponse
-from rosbridge.test_rosbridge import transport_cmd, cruise_cmd
-from rosbridge.poseStamped import PoseStamped
+# 获取当前文件的绝对路径
+basedir = os.path.abspath(os.path.dirname(__file__))
+# 将当前目录添加到环境变量
+sys.path.append(basedir)
 
-# 创建视图应用
-app = JsonFlask(__name__)
-# 解决跨域
+from flask import request, Flask
+from flask_cors import CORS
+import json
+from flask_json import FlaskJSON
+from flask_sqlalchemy import SQLAlchemy
+from views import ros_views
+# from models import user_model
+
+
+# 创建app
+app = Flask(__name__)
+# 跨域
 CORS(app, supports_credentials=True)
-# 处理本地文件路径
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(base_dir)
+# json
+FlaskJSON(app)
+
+# 数据库
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
+    basedir, "data.sqlite"
+)
+db = SQLAlchemy(app)
 
 
 # 类型转换或返回默认值
@@ -33,13 +44,18 @@ def get_req_value(key: str, target_type: str, from_data: bool = True):
             else:
                 return 0.0
         if target_type == "str":
-            if data.get(key, None) is not None and data[key] != "" and data[key] != "\"\"" and data[key] != "\'\'":
+            if (
+                data.get(key, None) is not None
+                and data[key] != ""
+                and data[key] != '""'
+                and data[key] != "''"
+            ):
                 return data[key]
             else:
                 return ""
         if target_type == "order":
             if data.get(key, None) is not None and data[key] != "":
-                return tuple(data[key].split(','))
+                return tuple(data[key].split(","))
             else:
                 return ()
     else:
@@ -54,38 +70,25 @@ def get_req_value(key: str, target_type: str, from_data: bool = True):
             else:
                 return 0.0
         if target_type == "str":
-            if request.args.get(key) is not None and request.args.get(key) != "" and request.args.get(
-                    key) != "\"\"" and request.args.get(key) != "\'\'":
+            if (
+                request.args.get(key) is not None
+                and request.args.get(key) != ""
+                and request.args.get(key) != '""'
+                and request.args.get(key) != "''"
+            ):
                 return request.args.get(key)
             else:
                 return ""
         if target_type == "order":
             if request.args.get(key) is not None and request.args.get(key) != "":
-                return tuple(request.args.get(key).split(','))
+                return tuple(request.args.get(key).split(","))
             else:
                 return ()
 
 
-@app.route("/transport", methods=["POST"])
-def app_transport():
-    start_pos = PoseStamped("map", 0.12, 1.73, 0, 1)
-    target_pos = PoseStamped("map", -4.36, -1.60, 0, 1)
-    origin_pos = PoseStamped("map", 0, 0, 0, 1)
-    table_height = 0.7
-    transport_cmd(start_pos, target_pos, origin_pos, table_height)
-    return JsonResponse.success()
+# 注册蓝图
+app.register_blueprint(ros_views.ros_bp)
 
 
-@app.route("/cruise", methods=["POST"])
-def app_cruise():
-    pos1 = PoseStamped("map", -4.09, 1.31, 0.70, 0.71)
-    pos2 = PoseStamped("map", -1.46, -1.63, -0.70, 0.70)
-    pos3 = PoseStamped("map", 4.05, -1.78, -0.70, 0.70)
-    origin_pos = PoseStamped("map", 0, 0, 0, 1)
-    poses = [pos1, pos2, pos3, origin_pos]
-    cruise_cmd(poses)
-    return JsonResponse.success()
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
