@@ -2,12 +2,16 @@
 
 ## 启动说明
 
-运行 `app/main.py` 文件启动后端服务，运行于 `http://localhost:5000/`。
+1. 启动 `app/main.py`
+2. 查看 `http://localhost:5000/`
 
 ## 在线 API 文档
 
-启动后端服务后，访问 `http://localhost:5000/apidocs/`，查看 API 资源。
+访问 `http://localhost:5000/apidocs/`
 
+
+> Tips
+> 
 > [**Flasgger**](https://github.com/flasgger/flasgger) 是一个 Flask 扩展，它从 API 中注册的所有 Flask 视图生成一个 OpenAPI 规范。Flasgger 带有一个内置的 SwaggerUI，允许可视化和交互 API 资源。Flasgger 易于使用，并与 Flask 框架集成。
 >
 > Flasgger 的优点包括：
