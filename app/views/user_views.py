@@ -9,5 +9,6 @@ user_bp = Blueprint("user_views", __name__)
 def get_user(id):
     user = User.query.get(id)
     if not user:
-        raise JsonError(description="用户不存在")
+        # 输出“不存在id为 {id} 的用户”错误
+        raise JsonError(description=f"不存在id为 {id} 的用户")
     return json_response(id=user.id, username=user.username)
