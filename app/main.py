@@ -15,6 +15,7 @@ import click
 # 注册蓝图
 app.register_blueprint(ros_bp)
 app.register_blueprint(user_bp)
+app.config["SECRET_KEY"] = "the quick brown fox jumps over the lazy dog"
 
 
 @app.cli.command()  # 注册为命令，可以传入 name 参数来自定义命令
