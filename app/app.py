@@ -6,89 +6,47 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # 将当前目录添加到环境变量
 sys.path.append(basedir)
 
-from flask import request, Flask
+from flask import Flask
 from flask_cors import CORS
-import json
 from flask_json import FlaskJSON
-from flask_sqlalchemy import SQLAlchemy
-from views import ros_views
-# from models import user_model
+from database import db
+import click
 
-
-# 创建app
+# 创建 Flask 实例
 app = Flask(__name__)
 # 跨域
 CORS(app, supports_credentials=True)
-# json
+# json 解析扩展
 FlaskJSON(app)
-
-# 数据库
+# 配置数据库
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
     basedir, "data.sqlite"
 )
-db = SQLAlchemy(app)
+db.init_app(app)
 
-
-# 类型转换或返回默认值
-def get_req_value(key: str, target_type: str, from_data: bool = True):
-    if from_data:
-        data = json.loads(request.data)
-        if target_type == "int":
-            if data.get(key, None) is not None and data[key] != "":
-                return int(data[key])
-            else:
-                return 0
-        if target_type == "float":
-            if data.get(key, None) is not None and data[key] != "":
-                return float(data[key])
-            else:
-                return 0.0
-        if target_type == "str":
-            if (
-                data.get(key, None) is not None
-                and data[key] != ""
-                and data[key] != '""'
-                and data[key] != "''"
-            ):
-                return data[key]
-            else:
-                return ""
-        if target_type == "order":
-            if data.get(key, None) is not None and data[key] != "":
-                return tuple(data[key].split(","))
-            else:
-                return ()
-    else:
-        if target_type == "int":
-            if request.args.get(key) is not None and request.args.get(key) != "":
-                return int(request.args.get(key))
-            else:
-                return 0
-        if target_type == "float":
-            if request.args.get(key) is not None and request.args.get(key) != "":
-                return float(request.args.get(key))
-            else:
-                return 0.0
-        if target_type == "str":
-            if (
-                request.args.get(key) is not None
-                and request.args.get(key) != ""
-                and request.args.get(key) != '""'
-                and request.args.get(key) != "''"
-            ):
-                return request.args.get(key)
-            else:
-                return ""
-        if target_type == "order":
-            if request.args.get(key) is not None and request.args.get(key) != "":
-                return tuple(request.args.get(key).split(","))
-            else:
-                return ()
-
+# 导入并注册蓝图
+# 注意这里是在 create_app 函数中导入，而不是在文件头部导入，避免循环导入
+from views import user_views, ros_views
 
 # 注册蓝图
 app.register_blueprint(ros_views.ros_bp)
+app.register_blueprint(user_views.user_bp)
+
+
+@app.cli.command()  # 注册为命令，可以传入 name 参数来自定义命令
+@click.option("--drop", is_flag=True, help="Create after drop.")  # 设置选项
+def initdb(drop):
+    """
+    命令行执行 flask initdb 命令创建数据库表，使用 --drop 选项删除表后重新创建
+    """
+    if drop:  # 判断是否输入了选项
+        db.drop_all()
+    db.create_all()
+    click.echo("Initialized database.")  # 输出提示信息
 
 
 if __name__ == "__main__":
+    if not os.path.exists(os.path.join(basedir, "data.sqlite")):
+        with app.app_context():
+            db.create_all()
     app.run(host="0.0.0.0", port=5000, debug=True)
