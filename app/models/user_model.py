@@ -72,6 +72,7 @@ def verify_password(username, password):
     user = User.query.filter_by(username=username).first()
     if not user or not user.verify_password(password):
         return False
+    # 保存当前登录用户
     g.user = user
     return True
 
@@ -86,6 +87,7 @@ def verify_token(token):
     user = User.verify_auth_token(token)
     if not user:
         return False
+    # 保存当前登录用户
     g.user = user
     return True
 

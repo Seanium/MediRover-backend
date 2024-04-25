@@ -1,4 +1,5 @@
 from flask import Flask
+from flasgger import Swagger
 from flask_cors import CORS
 from flask_json import FlaskJSON
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
@@ -28,3 +29,6 @@ db.init_app(app)
 basic_auth = HTTPBasicAuth()  # 基本认证
 token_auth = HTTPTokenAuth("Bearer")  # token 认证
 multi_auth = MultiAuth(basic_auth, token_auth)  # 多重认证
+
+# swagger
+swagger = Swagger(app)
