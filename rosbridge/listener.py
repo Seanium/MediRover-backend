@@ -9,7 +9,7 @@ def transport_listen(message: dict):
     :param message: 格式{‘data’: (string)xxx}
     :return:
     """
-    # print('get transport status: ' + message['data'])
+    print('get transport status: ' + message['data'])
 
 
 def cruise_listen(message: dict):
