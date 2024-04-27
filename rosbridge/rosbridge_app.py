@@ -46,9 +46,10 @@ def cruise_cmd(target_poses: list = None):
     send_goal_topic.publish(goal_msg)
     time.sleep(1)
 
+
 def exception_cmd(exc_type: int):
     """
-    向ROS发出异常处理指令，
+    向ROS发出异常处理指令，其中异常类型参见exception_table.py
     :return:
     """
     interrupt_topic = roslibpy.Topic(client, "/exception_cmd", "std_msgs/String")
@@ -60,6 +61,31 @@ def exception_cmd(exc_type: int):
         print("sending recover message...")
     interrupt_topic.publish(exc_cmd)
     time.sleep(1)
+
+
+def mapping_cmd(cmd: str):
+    """
+    向ROS发送建图命令
+    :param cmd: 从以下模式中选择一个：start,save,end
+    :return:
+    """
+    mapping_topic = roslibpy.Topic(client, "/bd_map_cmd", "std_msgs/String")
+    mapping_topic.publish(roslibpy.Message({"data": cmd}))
+    print("sending mapping message...")
+    time.sleep(1)
+
+
+def vel_ctrl_cmd(cmd: str):
+    """
+    向ROS发送移动控制命令
+    :param cmd: 从以下模式中选择一个：stop,front,back,left,right,turn_left,turn_right
+    :return:
+    """
+    vel_ctrl_topic = roslibpy.Topic(client, "/cli_vel_ctrl", "std_msgs/String")
+    vel_ctrl_topic.publish(roslibpy.Message({"data": cmd}))
+    print("sending vel_ctrl message...")
+    time.sleep(1)
+
 
 if __name__ == '__main__':
     def app_transport():
@@ -78,8 +104,18 @@ if __name__ == '__main__':
         poses = [pos1, pos2, pos3, origin_pos]
         cruise_cmd(poses)
 
-
+    # 调用方式：
     # app_transport()
     # exception_cmd(ExceptionTable.interrupt)
     # exception_cmd(ExceptionTable.recover)
-    app_cruise()
+    # app_cruise()
+    # mapping_cmd("start")
+    # mapping_cmd("save")
+    # mapping_cmd("end")
+    # vel_ctrl_cmd("stop")
+    # vel_ctrl_cmd("front")
+    # vel_ctrl_cmd("back")
+    # vel_ctrl_cmd("left")
+    # vel_ctrl_cmd("right")
+    # vel_ctrl_cmd("turn_left")
+    # vel_ctrl_cmd("turn_right")
