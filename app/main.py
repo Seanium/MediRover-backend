@@ -10,11 +10,13 @@ sys.path.append(basedir)
 from database import db
 from views.ros_views import ros_bp
 from views.user_views import user_bp
+from views.map_views import map_bp
 import click
 
 # 注册蓝图
 app.register_blueprint(ros_bp)
 app.register_blueprint(user_bp)
+app.register_blueprint(map_bp)
 app.config["SECRET_KEY"] = "the quick brown fox jumps over the lazy dog"
 
 
