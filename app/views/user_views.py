@@ -2,7 +2,7 @@ from flask import Blueprint, g
 from models.user_model import User
 from flask_json import JsonError, json_response, request
 from database import db
-from app import multi_auth, basic_auth, token_auth
+from app import multi_auth
 
 user_bp = Blueprint("user_views", __name__)
 
