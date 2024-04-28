@@ -9,10 +9,9 @@ user_bp = Blueprint("user_views", __name__)
 
 @user_bp.route("/users", methods=["POST"])
 def new_user():
-    # swagger 文档
     """
     注册新用户
-    请求体必须包含一个定义了用户名和密码字段的 JSON 对象。
+    请求体必须包含一个定义了用户名和密码字段的 JSON 对象，也可以包含一个可选的角色字段。
     成功时，返回状态码 201。响应体包含一个 JSON 对象，其中包含新添加的用户的信息。
     失败时，返回状态码 400（请求错误）。
     ---
@@ -33,6 +32,9 @@ def new_user():
             password:
               type: string
               description: 密码
+            role:
+              type: string
+              description: 用户角色
     responses:
       200:
         description: 用户创建成功
@@ -56,13 +58,14 @@ def new_user():
     """
     username = request.json.get("username")
     password = request.json.get("password")
+    role = request.json.get("role", "user")  # 如果未提供角色，设置为 "user"
     if username is None or password is None:
         # 返回错误：用户名和密码不能为空
         raise JsonError(description="用户名和密码不能为空")
     if User.query.filter_by(username=username).first() is not None:
         # 返回错误：用户名为 {username} 的用户已存在
         raise JsonError(description=f"用户名为 {username} 的用户已存在")
-    user = User(username=username)
+    user = User(username=username, role=role)  # 在创建用户时设置角色
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
