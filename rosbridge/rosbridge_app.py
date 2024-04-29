@@ -1,3 +1,12 @@
+import sys
+import os
+
+# 添加父目录到系统路径
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+
+# 打印系统路径
+print(sys.path)
+
 import roslibpy
 import time
 from rosbridge.listener import client
@@ -126,7 +135,7 @@ if __name__ == "__main__":
     # exception_cmd(ExceptionTable.recover)
     # app_cruise()
     # mapping_cmd("start")
-    # mapping_cmd("save")
+    mapping_cmd("save")
     # mapping_cmd("end")
     # vel_ctrl_cmd("stop")
     # vel_ctrl_cmd("front")
@@ -135,4 +144,4 @@ if __name__ == "__main__":
     # vel_ctrl_cmd("right")
     # vel_ctrl_cmd("turn_left")
     # vel_ctrl_cmd("turn_right")
-    take_temperature_cmd(False)
+    # take_temperature_cmd(False)
