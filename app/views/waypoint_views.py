@@ -397,9 +397,9 @@ def delete_waypoint(waypoint_id):
 
 
 @waypoint_bp.route("/waypoints/startcruisebyvalue", methods=["post"])
-def startcruise():
+def startcruisebyvalue():
     """
-    启动巡诊模式
+    启动巡诊模式，传入航点坐标值列表
     参数是一个航点坐标值列表，其中最后一个航点是机器人的起始点
     每个航点只需要传入pos_x, pos_y, ori_z, ori_w
     剩余的pos_z, ori_x, ori_y都是默认值0
@@ -411,7 +411,7 @@ def startcruise():
         name: body
         required: true
         schema:
-          id: CruiseStart
+          id: CruiseStartByValue
           required:
             - waypoints
           properties:
@@ -455,7 +455,7 @@ def startcruise():
 @waypoint_bp.route("/waypoints/startcruisebyname", methods=["post"])
 def startcruisebyname():
     """
-    启动巡诊模式
+    启动巡诊模式，传入航点名称列表
     参数是一个航点名称列表，其中最后一个航点是机器人的起始点
     ---
     tags:
