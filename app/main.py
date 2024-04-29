@@ -1,14 +1,14 @@
 import sys
 import os
+
+# 添加父目录到系统路径
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
+
+# 打印系统路径
+print(sys.path)
+
 from app import app
-
-# 获取当前文件的绝对路径
-basedir = os.path.abspath(os.path.dirname(__file__))
-# 将当前目录添加到环境变量
-sys.path.append(basedir)
-
 from database import db
-from views.ros_views import ros_bp
 from views.user_views import user_bp
 from views.map_views import map_bp
 from views.waypoint_views import waypoint_bp
@@ -18,7 +18,6 @@ from views.pt_views import pt_bp
 import click
 
 # 注册蓝图
-app.register_blueprint(ros_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(map_bp)
 app.register_blueprint(waypoint_bp)
@@ -41,6 +40,8 @@ def initdb(drop):
 
 
 if __name__ == "__main__":
+    # 获取当前文件所属目录的绝对路径
+    basedir = os.path.abspath(os.path.dirname(__file__))
     if not os.path.exists(os.path.join(basedir, "data.sqlite")):
         with app.app_context():
             db.create_all()

@@ -2,6 +2,7 @@ from flask import Blueprint
 from models.robot_model import Robot
 from flask_json import JsonError, json_response, request
 from database import db
+from rosbridge.rosbridge_app import vel_ctrl_cmd
 
 robot_bp = Blueprint("robot_views", __name__)
 
@@ -231,4 +232,116 @@ def delete_robot(robot_id):
     db.session.delete(robot)
     db.session.commit()
 
+    return json_response()
+
+
+@robot_bp.route("/ctrl/stop", methods=["POST"])
+def stop():
+    """
+    发送停止命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送停止命令成功
+    """
+    vel_ctrl_cmd("stop")
+    return json_response()
+
+
+@robot_bp.route("/ctrl/front", methods=["POST"])
+def front():
+    """
+    发送前进命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送前进命令成功
+    """
+    vel_ctrl_cmd("front")
+    return json_response()
+
+
+@robot_bp.route("/ctrl/back", methods=["POST"])
+def back():
+    """
+    发送后退命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送后退命令成功
+    """
+    vel_ctrl_cmd("back")
+    return json_response()
+
+
+@robot_bp.route("/ctrl/left", methods=["POST"])
+def left():
+    """
+    发送左移命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送左移命令成功
+    """
+    vel_ctrl_cmd("left")
+    return json_response()
+
+
+@robot_bp.route("/ctrl/right", methods=["POST"])
+def right():
+    """
+    发送右移命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送右移命令成功
+    """
+    vel_ctrl_cmd("right")
+    return json_response()
+
+
+@robot_bp.route("/ctrl/turn_left", methods=["POST"])
+def turn_left():
+    """
+    发送左转命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送左转命令成功
+    """
+    vel_ctrl_cmd("turn_left")
+    return json_response()
+
+
+@robot_bp.route("/ctrl/turn_right", methods=["POST"])
+def turn_right():
+    """
+    发送右转命令
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Robot
+    responses:
+      200:
+        description: 发送右转命令成功
+    """
+    vel_ctrl_cmd("turn_right")
     return json_response()
