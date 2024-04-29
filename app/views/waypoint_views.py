@@ -1,7 +1,13 @@
+import sys
+
+sys.path.insert(0, sys.path[0] + "/../")
+
 from flask import Blueprint
 from models.waypoint_model import Waypoint
 from flask_json import JsonError, json_response, request
 from database import db
+from rosbridge.poseStamped import PoseStamped
+from rosbridge.rosbridge_app import cruise_cmd
 
 waypoint_bp = Blueprint("waypoint", __name__)
 
@@ -391,4 +397,100 @@ def delete_waypoint(waypoint_id):
         raise JsonError(description="Waypoint not found.")
     db.session.delete(waypoint)
     db.session.commit()
+    return json_response()
+
+
+@waypoint_bp.route("/waypoints/startcruisebyvalue", methods=["post"])
+def startcruise():
+    """
+    启动巡诊模式
+    参数是一个航点坐标值列表，其中最后一个航点是机器人的起始点
+    每个航点只需要传入pos_x, pos_y, ori_z, ori_w
+    剩余的pos_z, ori_x, ori_y都是默认值0
+    ---
+    tags:
+      - Waypoint
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: CruiseStart
+          required:
+            - waypoints
+          properties:
+            waypoints:
+              type: array
+              items:
+                type: object
+                properties:
+                  pos_x:
+                    type: float
+                    description: 航点 x 坐标
+                  pos_y:
+                    type: float
+                    description: 航点 y 坐标
+                  ori_z:
+                    type: float
+                    description: 航点 z 方向
+                  ori_w:
+                    type: float
+                    description: 航点 w 方向
+    responses:
+      200:
+        description: 启动巡诊模式成功
+    """
+    data = request.get_json()
+    waypoints = []
+    for waypoint in data["waypoints"]:
+        waypoints.append(
+            PoseStamped(
+                "map",
+                waypoint["pos_x"],
+                waypoint["pos_y"],
+                waypoint["ori_z"],
+                waypoint["ori_w"],
+            )
+        )
+    cruise_cmd(waypoints)
+    return json_response()
+
+
+@waypoint_bp.route("/waypoints/startcruisebyname", methods=["post"])
+def startcruisebyname():
+    """
+    启动巡诊模式
+    参数是一个航点名称列表，其中最后一个航点是机器人的起始点
+    ---
+    tags:
+      - Waypoint
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: CruiseStartByName
+          required:
+            - waypoints
+          properties:
+            waypoints:
+              type: array
+              items:
+                type: string
+    responses:
+      200:
+        description: 启动巡诊模式成功
+    """
+    data = request.get_json()
+    waypoints = []
+    for waypoint_name in data["waypoints"]:
+        waypoint = Waypoint.query.filter_by(waypointname=waypoint_name).first()
+        if waypoint is None:
+            raise JsonError(description="Waypoint not found.")
+        waypoints.append(
+            PoseStamped(
+                "map", waypoint.pos_x, waypoint.pos_y, waypoint.ori_z, waypoint.ori_w
+            )
+        )
+    cruise_cmd(waypoints)
     return json_response()

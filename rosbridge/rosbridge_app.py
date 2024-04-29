@@ -1,8 +1,8 @@
 import roslibpy
 import time
-from rosbridge.__init__ import client
-from rosbridge.poseStamped import PoseStamped
-from rosbridge.exception_table import ExceptionTable
+from __init__ import client
+from poseStamped import PoseStamped
+from exception_table import ExceptionTable
 
 
 def transport_cmd(start_pos: PoseStamped, target_pos: PoseStamped, origin_pos: PoseStamped, table_height):
