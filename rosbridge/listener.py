@@ -1,6 +1,9 @@
 import roslibpy
 
-from __init__ import client
+client = roslibpy.Ros(host="192.168.5.131", port=9090)
+client.run()
+
+print("ros_bridge connection is ", client.is_connected)
 
 
 def transport_listen(message: dict):

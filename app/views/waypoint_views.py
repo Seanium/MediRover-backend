@@ -1,7 +1,3 @@
-import sys
-
-sys.path.insert(0, sys.path[0] + "/../")
-
 from flask import Blueprint
 from models.waypoint_model import Waypoint
 from flask_json import JsonError, json_response, request
