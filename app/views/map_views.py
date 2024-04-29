@@ -2,6 +2,7 @@ from flask import Blueprint
 from models.map_model import Map
 from flask_json import JsonError, json_response, request
 from database import db
+from rosbridge.rosbridge_app import mapping_cmd
 
 map_bp = Blueprint("map_views", __name__)
 
@@ -287,3 +288,51 @@ def delete_map(map_id):
         mappath=map.mappath,
         waypointpath=map.waypointpath,
     )
+
+
+@map_bp.route("/maps/start_mapping", methods=["POST"])
+def start_mapping():
+    """
+    开始建图
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Map
+    responses:
+      200:
+        description: 开始建图成功
+    """
+    mapping_cmd("start")
+    return json_response()
+
+
+@map_bp.route("/maps/save_map", methods=["POST"])
+def save_map():
+    """
+    保存地图
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Map
+    responses:
+      200:
+        description: 保存地图成功
+    """
+    mapping_cmd("save")
+    return json_response()
+
+
+@map_bp.route("/maps/end_mapping", methods=["POST"])
+def end_mapping():
+    """
+    结束建图
+    请求成功时，返回状态码 200。响应体为空。
+    ---
+    tags:
+      - Map
+    responses:
+      200:
+        description: 结束建图成功
+    """
+    mapping_cmd("end")
+    return json_response()
