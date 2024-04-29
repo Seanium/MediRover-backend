@@ -87,6 +87,18 @@ def vel_ctrl_cmd(cmd: str):
     time.sleep(1)
 
 
+def take_temperature_cmd(cmd: bool):
+    """
+    向ROS发送测温命令
+    :param cmd: 若为True，则同意马上测温；若为False，则跳过测温步骤
+    :return:
+    """
+    take_tp_topic = roslibpy.Topic(client, "/take_tp_reply", "std_msgs/Bool")
+    take_tp_topic.publish(roslibpy.Message({"data": cmd}))
+    print("sending take temperature message...")
+    time.sleep(1)
+
+
 if __name__ == '__main__':
     def app_transport():
         start_pos = PoseStamped("map", 0.12, 1.73, 0, 1)
@@ -119,3 +131,4 @@ if __name__ == '__main__':
     # vel_ctrl_cmd("right")
     # vel_ctrl_cmd("turn_left")
     # vel_ctrl_cmd("turn_right")
+    take_temperature_cmd(False)
