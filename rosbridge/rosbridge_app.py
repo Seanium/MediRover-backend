@@ -15,10 +15,10 @@ from rosbridge.exception_table import ExceptionTable
 
 
 def transport_cmd(
-    start_pos: PoseStamped,
-    target_pos: PoseStamped,
-    origin_pos: PoseStamped,
-    table_height,
+        start_pos: PoseStamped,
+        target_pos: PoseStamped,
+        origin_pos: PoseStamped,
+        table_height,
 ):
     """
     向ROS端发送送药命令
@@ -112,14 +112,26 @@ def take_temperature_cmd(cmd: bool):
     time.sleep(1)
 
 
-if __name__ == "__main__":
+def proc_waypoint_cmd(cmd: str):
+    """
+    向ROS发送航点标注命令
+    :param cmd: 从以下模式中选择一个：start,save,end
+    :return:
+    """
+    proc_waypoint_topic = roslibpy.Topic(client, "/proc_waypoint_cmd", "std_msgs/String")
+    proc_waypoint_topic.publish(roslibpy.Message({"data": cmd}))
+    print("sending process waypoint message...")
+    time.sleep(1)
 
+
+if __name__ == "__main__":
     def app_transport():
         start_pos = PoseStamped("map", 0.12, 1.73, 0, 1)
         target_pos = PoseStamped("map", -4.36, -1.60, 0, 1)
         origin_pos = PoseStamped("map", 0, 0, 0, 1)
         table_height = 0.7
         transport_cmd(start_pos, target_pos, origin_pos, table_height)
+
 
     def app_cruise():
         pos1 = PoseStamped("map", -4.09, 1.31, 0.70, 0.71)
@@ -129,13 +141,14 @@ if __name__ == "__main__":
         poses = [pos1, pos2, pos3, origin_pos]
         cruise_cmd(poses)
 
+
     # 调用方式：
     # app_transport()
     # exception_cmd(ExceptionTable.interrupt)
     # exception_cmd(ExceptionTable.recover)
     # app_cruise()
     # mapping_cmd("start")
-    mapping_cmd("save")
+    # mapping_cmd("save")
     # mapping_cmd("end")
     # vel_ctrl_cmd("stop")
     # vel_ctrl_cmd("front")
@@ -145,3 +158,6 @@ if __name__ == "__main__":
     # vel_ctrl_cmd("turn_left")
     # vel_ctrl_cmd("turn_right")
     # take_temperature_cmd(False)
+    # proc_waypoint_cmd("start")
+    # proc_waypoint_cmd("save")
+    proc_waypoint_cmd("end")
